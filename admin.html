@@ -1,0 +1,2906 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Vortex Hosting - Admin Panel</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        vortex: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1'
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    >
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+        }
+
+        .sidebar-item {
+            transition: all .2s ease;
+        }
+
+        .sidebar-item:hover {
+            background: #f1f5f9;
+            color: #0284c7;
+        }
+
+        .sidebar-item.active {
+            background: #e0f2fe;
+            color: #0284c7;
+            font-weight: 700;
+        }
+
+        .table-scroll::-webkit-scrollbar {
+            height: 7px;
+            width: 7px;
+        }
+
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 20px;
+        }
+
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- ===================================================== -->
+    <!-- YETKİ KONTROL EKRANI -->
+    <!-- ===================================================== -->
+
+    <div
+        id="accessScreen"
+        class="fixed inset-0 z-[200] bg-slate-950 flex items-center justify-center p-6"
+    >
+        <div class="text-center">
+
+            <div
+                class="w-16 h-16 mx-auto rounded-2xl
+                       bg-gradient-to-br from-sky-500 to-blue-600
+                       flex items-center justify-center
+                       shadow-xl shadow-sky-500/20"
+            >
+                <i class="fa-solid fa-shield-halved text-white text-2xl"></i>
+            </div>
+
+            <h1 class="text-white text-2xl font-extrabold mt-5">
+                Vortex Admin
+            </h1>
+
+            <p
+                id="accessMessage"
+                class="text-slate-400 mt-2 text-sm"
+            >
+                Yetki kontrol ediliyor...
+            </p>
+
+            <div class="mt-6">
+                <i class="fa-solid fa-spinner fa-spin text-sky-500 text-xl"></i>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- ADMIN PANEL -->
+    <!-- ===================================================== -->
+
+    <div
+        id="adminPanel"
+        class="hidden min-h-screen"
+    >
+
+        <!-- ================================================= -->
+        <!-- SIDEBAR -->
+        <!-- ================================================= -->
+
+        <aside
+            id="sidebar"
+            class="fixed top-0 left-0 bottom-0 z-50
+                   w-72 bg-white border-r border-slate-200
+                   hidden lg:flex flex-col"
+        >
+
+            <div
+                class="h-[76px] px-6 border-b border-slate-100
+                       flex items-center"
+            >
+
+                <div class="flex items-center gap-3">
+
+                    <div
+                        class="w-10 h-10 rounded-xl
+                               bg-gradient-to-br from-sky-500 to-blue-600
+                               flex items-center justify-center
+                               shadow-lg shadow-sky-500/20"
+                    >
+                        <i class="fa-solid fa-cube text-white"></i>
+                    </div>
+
+                    <div>
+                        <div class="font-extrabold text-slate-900 leading-none">
+                            VORTEX
+                        </div>
+
+                        <div
+                            class="text-[10px] font-bold text-sky-600
+                                   tracking-[0.2em] mt-1"
+                        >
+                            ADMIN PANEL
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="flex-1 overflow-y-auto p-4">
+
+                <div
+                    class="px-3 text-[10px] font-bold uppercase
+                           tracking-[0.18em] text-slate-400 mb-3"
+                >
+                    Yönetim
+                </div>
+
+
+                <nav class="space-y-1">
+
+                    <button
+                        onclick="showAdminSection('overview')"
+                        id="admin-nav-overview"
+                        class="sidebar-item active
+                               w-full flex items-center gap-3
+                               px-4 py-3 rounded-xl text-sm text-left"
+                    >
+                        <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+
+                        Genel Bakış
+                    </button>
+
+
+                    <button
+                        onclick="showAdminSection('users')"
+                        id="admin-nav-users"
+                        class="sidebar-item
+                               w-full flex items-center gap-3
+                               px-4 py-3 rounded-xl text-sm text-left"
+                    >
+                        <i class="fa-solid fa-users w-5 text-center"></i>
+
+                        Kullanıcılar
+                    </button>
+
+
+                    <button
+                        onclick="showAdminSection('services')"
+                        id="admin-nav-services"
+                        class="sidebar-item
+                               w-full flex items-center gap-3
+                               px-4 py-3 rounded-xl text-sm text-left"
+                    >
+                        <i class="fa-solid fa-server w-5 text-center"></i>
+
+                        Hizmetler
+                    </button>
+
+
+                    <button
+                        onclick="showAdminSection('orders')"
+                        id="admin-nav-orders"
+                        class="sidebar-item
+                               w-full flex items-center gap-3
+                               px-4 py-3 rounded-xl text-sm text-left"
+                    >
+                        <i class="fa-solid fa-cart-shopping w-5 text-center"></i>
+
+                        Siparişler
+                    </button>
+
+
+                    <button
+                        onclick="showAdminSection('invoices')"
+                        id="admin-nav-invoices"
+                        class="sidebar-item
+                               w-full flex items-center gap-3
+                               px-4 py-3 rounded-xl text-sm text-left"
+                    >
+                        <i class="fa-solid fa-file-invoice-dollar w-5 text-center"></i>
+
+                        Faturalar
+                    </button>
+
+
+                    <button
+                        onclick="showAdminSection('system')"
+                        id="admin-nav-system"
+                        class="sidebar-item
+                               w-full flex items-center gap-3
+                               px-4 py-3 rounded-xl text-sm text-left"
+                    >
+                        <i class="fa-solid fa-gear w-5 text-center"></i>
+
+                        Sistem
+                    </button>
+
+                </nav>
+
+            </div>
+
+
+            <div class="p-4 border-t border-slate-100">
+
+                <div
+                    class="rounded-xl bg-slate-50 border border-slate-200
+                           p-4 mb-3"
+                >
+
+                    <div
+                        class="text-[10px] font-bold uppercase
+                               tracking-wide text-slate-400"
+                    >
+                        Yönetici
+                    </div>
+
+                    <div
+                        id="sidebarAdminName"
+                        class="font-semibold text-sm text-slate-900 mt-1"
+                    >
+                        Admin
+                    </div>
+
+                    <div
+                        id="sidebarAdminEmail"
+                        class="text-xs text-slate-500 mt-1 truncate"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <button
+                    onclick="goToWebsite()"
+                    class="w-full flex items-center gap-3
+                           px-4 py-3 rounded-xl
+                           text-sm font-medium text-slate-600
+                           hover:bg-slate-50 transition"
+                >
+                    <i class="fa-solid fa-house w-5 text-center"></i>
+
+                    Siteye Dön
+                </button>
+
+
+                <button
+                    onclick="adminLogout()"
+                    class="w-full flex items-center gap-3
+                           px-4 py-3 rounded-xl
+                           text-sm font-medium text-red-500
+                           hover:bg-red-50 transition"
+                >
+                    <i class="fa-solid fa-right-from-bracket w-5 text-center"></i>
+
+                    Çıkış Yap
+                </button>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ================================================= -->
+        <!-- MOBİL SIDEBAR BACKDROP -->
+        <!-- ================================================= -->
+
+        <div
+            id="mobileSidebarBackdrop"
+            onclick="closeMobileSidebar()"
+            class="fixed inset-0 z-40 bg-slate-950/40
+                   hidden lg:hidden"
+        ></div>
+
+
+        <!-- ================================================= -->
+        <!-- MOBİL SIDEBAR -->
+        <!-- ================================================= -->
+
+        <aside
+            id="mobileSidebar"
+            class="fixed top-0 left-0 bottom-0 z-50
+                   w-72 bg-white border-r border-slate-200
+                   -translate-x-full transition-transform
+                   lg:hidden"
+        >
+
+            <div
+                class="h-[76px] px-5 flex items-center justify-between
+                       border-b border-slate-100"
+            >
+
+                <div class="font-extrabold">
+                    VORTEX ADMIN
+                </div>
+
+                <button
+                    onclick="closeMobileSidebar()"
+                    class="w-9 h-9 rounded-xl
+                           hover:bg-slate-100"
+                >
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+            </div>
+
+
+            <div class="p-4 space-y-1">
+
+                <button
+                    onclick="mobileNavigate('overview')"
+                    class="sidebar-item w-full px-4 py-3 rounded-xl
+                           text-left flex gap-3 items-center"
+                >
+                    <i class="fa-solid fa-chart-pie"></i>
+                    Genel Bakış
+                </button>
+
+                <button
+                    onclick="mobileNavigate('users')"
+                    class="sidebar-item w-full px-4 py-3 rounded-xl
+                           text-left flex gap-3 items-center"
+                >
+                    <i class="fa-solid fa-users"></i>
+                    Kullanıcılar
+                </button>
+
+                <button
+                    onclick="mobileNavigate('services')"
+                    class="sidebar-item w-full px-4 py-3 rounded-xl
+                           text-left flex gap-3 items-center"
+                >
+                    <i class="fa-solid fa-server"></i>
+                    Hizmetler
+                </button>
+
+                <button
+                    onclick="mobileNavigate('orders')"
+                    class="sidebar-item w-full px-4 py-3 rounded-xl
+                           text-left flex gap-3 items-center"
+                >
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    Siparişler
+                </button>
+
+                <button
+                    onclick="mobileNavigate('invoices')"
+                    class="sidebar-item w-full px-4 py-3 rounded-xl
+                           text-left flex gap-3 items-center"
+                >
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    Faturalar
+                </button>
+
+                <button
+                    onclick="mobileNavigate('system')"
+                    class="sidebar-item w-full px-4 py-3 rounded-xl
+                           text-left flex gap-3 items-center"
+                >
+                    <i class="fa-solid fa-gear"></i>
+                    Sistem
+                </button>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ================================================= -->
+        <!-- ANA İÇERİK -->
+        <!-- ================================================= -->
+
+        <div class="lg:ml-72 min-h-screen">
+
+
+            <!-- ============================================= -->
+            <!-- TOPBAR -->
+            <!-- ============================================= -->
+
+            <header
+                class="sticky top-0 z-30 h-[76px]
+                       bg-white/95 backdrop-blur
+                       border-b border-slate-200
+                       flex items-center justify-between
+                       px-5 md:px-8"
+            >
+
+                <div class="flex items-center gap-3">
+
+                    <button
+                        onclick="openMobileSidebar()"
+                        class="lg:hidden w-10 h-10 rounded-xl
+                               bg-slate-100 hover:bg-slate-200 transition"
+                    >
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+
+                    <div>
+
+                        <h2
+                            id="pageTitle"
+                            class="font-extrabold text-slate-900"
+                        >
+                            Genel Bakış
+                        </h2>
+
+                        <p
+                            id="pageSubtitle"
+                            class="text-xs text-slate-500 mt-0.5"
+                        >
+                            Vortex Hosting yönetim merkezi
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="flex items-center gap-3">
+
+                    <button
+                        onclick="refreshCurrentSection()"
+                        class="w-10 h-10 rounded-xl
+                               bg-slate-100 hover:bg-slate-200
+                               text-slate-600 transition"
+                        title="Yenile"
+                    >
+                        <i class="fa-solid fa-rotate"></i>
+                    </button>
+
+                    <div
+                        class="hidden sm:flex items-center gap-2
+                               px-3 py-2 rounded-xl
+                               bg-emerald-50 text-emerald-600
+                               text-xs font-semibold"
+                    >
+                        <span
+                            class="w-2 h-2 rounded-full bg-emerald-500"
+                        ></span>
+
+                        Backend Aktif
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <!-- ============================================= -->
+            <!-- CONTENT -->
+            <!-- ============================================= -->
+
+            <main class="p-5 md:p-8">
+
+
+                <!-- ========================================= -->
+                <!-- GENEL BAKIŞ -->
+                <!-- ========================================= -->
+
+                <section
+                    id="admin-section-overview"
+                    class="admin-section"
+                >
+
+                    <div
+                        class="grid grid-cols-1 sm:grid-cols-2
+                               xl:grid-cols-4 gap-5"
+                    >
+
+
+                        <div
+                            class="bg-white border border-slate-200
+                                   rounded-2xl p-6 shadow-sm"
+                        >
+
+                            <div class="flex justify-between items-start">
+
+                                <div>
+
+                                    <p
+                                        class="text-xs uppercase
+                                               tracking-wide font-bold
+                                               text-slate-400"
+                                    >
+                                        Kullanıcılar
+                                    </p>
+
+                                    <p
+                                        id="statUsers"
+                                        class="text-3xl font-extrabold
+                                               text-slate-900 mt-2"
+                                    >
+                                        0
+                                    </p>
+
+                                </div>
+
+                                <div
+                                    class="w-11 h-11 rounded-xl
+                                           bg-sky-50 text-sky-500
+                                           flex items-center justify-center"
+                                >
+                                    <i class="fa-solid fa-users"></i>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="bg-white border border-slate-200
+                                   rounded-2xl p-6 shadow-sm"
+                        >
+
+                            <div class="flex justify-between items-start">
+
+                                <div>
+
+                                    <p
+                                        class="text-xs uppercase
+                                               tracking-wide font-bold
+                                               text-slate-400"
+                                    >
+                                        Aktif Hizmet
+                                    </p>
+
+                                    <p
+                                        id="statServices"
+                                        class="text-3xl font-extrabold
+                                               text-slate-900 mt-2"
+                                    >
+                                        0
+                                    </p>
+
+                                </div>
+
+                                <div
+                                    class="w-11 h-11 rounded-xl
+                                           bg-emerald-50 text-emerald-500
+                                           flex items-center justify-center"
+                                >
+                                    <i class="fa-solid fa-server"></i>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="bg-white border border-slate-200
+                                   rounded-2xl p-6 shadow-sm"
+                        >
+
+                            <div class="flex justify-between items-start">
+
+                                <div>
+
+                                    <p
+                                        class="text-xs uppercase
+                                               tracking-wide font-bold
+                                               text-slate-400"
+                                    >
+                                        Sipariş
+                                    </p>
+
+                                    <p
+                                        id="statOrders"
+                                        class="text-3xl font-extrabold
+                                               text-slate-900 mt-2"
+                                    >
+                                        0
+                                    </p>
+
+                                </div>
+
+                                <div
+                                    class="w-11 h-11 rounded-xl
+                                           bg-violet-50 text-violet-500
+                                           flex items-center justify-center"
+                                >
+                                    <i class="fa-solid fa-cart-shopping"></i>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="bg-white border border-slate-200
+                                   rounded-2xl p-6 shadow-sm"
+                        >
+
+                            <div class="flex justify-between items-start">
+
+                                <div>
+
+                                    <p
+                                        class="text-xs uppercase
+                                               tracking-wide font-bold
+                                               text-slate-400"
+                                    >
+                                        Toplam Gelir
+                                    </p>
+
+                                    <p
+                                        id="statRevenue"
+                                        class="text-3xl font-extrabold
+                                               text-slate-900 mt-2"
+                                    >
+                                        ₺0.00
+                                    </p>
+
+                                </div>
+
+                                <div
+                                    class="w-11 h-11 rounded-xl
+                                           bg-amber-50 text-amber-500
+                                           flex items-center justify-center"
+                                >
+                                    <i class="fa-solid fa-turkish-lira-sign"></i>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="grid grid-cols-1 xl:grid-cols-2
+                               gap-6 mt-7"
+                    >
+
+
+                        <div
+                            class="bg-white border border-slate-200
+                                   rounded-2xl shadow-sm overflow-hidden"
+                        >
+
+                            <div
+                                class="px-6 py-5
+                                       border-b border-slate-100"
+                            >
+
+                                <h3 class="font-bold">
+                                    Son Kullanıcılar
+                                </h3>
+
+                                <p class="text-xs text-slate-500 mt-1">
+                                    Sisteme son kayıt olan kullanıcılar
+                                </p>
+
+                            </div>
+
+                            <div
+                                id="recentUsers"
+                                class="p-6"
+                            >
+                                <div class="text-sm text-slate-400">
+                                    Yükleniyor...
+                                </div>
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="bg-white border border-slate-200
+                                   rounded-2xl shadow-sm overflow-hidden"
+                        >
+
+                            <div
+                                class="px-6 py-5
+                                       border-b border-slate-100"
+                            >
+
+                                <h3 class="font-bold">
+                                    Son Siparişler
+                                </h3>
+
+                                <p class="text-xs text-slate-500 mt-1">
+                                    Son oluşturulan siparişler
+                                </p>
+
+                            </div>
+
+                            <div
+                                id="recentOrders"
+                                class="p-6"
+                            >
+                                <div class="text-sm text-slate-400">
+                                    Yükleniyor...
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ========================================= -->
+                <!-- KULLANICILAR -->
+                <!-- ========================================= -->
+
+                <section
+                    id="admin-section-users"
+                    class="admin-section hidden"
+                >
+
+                    <div
+                        class="bg-white border border-slate-200
+                               rounded-2xl shadow-sm overflow-hidden"
+                    >
+
+                        <div
+                            class="p-5 md:p-6 border-b border-slate-100
+                                   flex flex-col md:flex-row
+                                   md:items-center justify-between gap-4"
+                        >
+
+                            <div>
+
+                                <h3 class="font-bold text-lg">
+                                    Kullanıcılar
+                                </h3>
+
+                                <p class="text-sm text-slate-500">
+                                    Sistemde kayıtlı kullanıcı hesapları
+                                </p>
+
+                            </div>
+
+
+                            <div
+                                class="relative w-full md:w-72"
+                            >
+
+                                <i
+                                    class="fa-solid fa-magnifying-glass
+                                           absolute left-4 top-1/2
+                                           -translate-y-1/2 text-slate-400"
+                                ></i>
+
+                                <input
+                                    id="userSearch"
+                                    oninput="filterUsers()"
+                                    type="text"
+                                    placeholder="Kullanıcı ara..."
+                                    class="w-full pl-11 pr-4 py-3
+                                           rounded-xl border border-slate-200
+                                           bg-slate-50 outline-none
+                                           focus:border-sky-400 text-sm"
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="overflow-x-auto table-scroll">
+
+                            <table class="w-full min-w-[850px] text-sm">
+
+                                <thead
+                                    class="bg-slate-50
+                                           border-b border-slate-200"
+                                >
+                                    <tr
+                                        class="text-left text-xs
+                                               uppercase tracking-wide
+                                               text-slate-500"
+                                    >
+
+                                        <th class="px-5 py-4">
+                                            ID
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Kullanıcı
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            E-posta
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Rol
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Kayıt
+                                        </th>
+
+                                        <th class="px-5 py-4 text-right">
+                                            İşlem
+                                        </th>
+
+                                    </tr>
+                                </thead>
+
+                                <tbody
+                                    id="usersTableBody"
+                                    class="divide-y divide-slate-100"
+                                ></tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ========================================= -->
+                <!-- HİZMETLER -->
+                <!-- ========================================= -->
+
+                <section
+                    id="admin-section-services"
+                    class="admin-section hidden"
+                >
+
+                    <div
+                        class="bg-white border border-slate-200
+                               rounded-2xl shadow-sm overflow-hidden"
+                    >
+
+                        <div
+                            class="p-6 border-b border-slate-100"
+                        >
+
+                            <h3 class="font-bold text-lg">
+                                Tüm Hizmetler
+                            </h3>
+
+                            <p class="text-sm text-slate-500">
+                                Müşterilere ait hosting, domain,
+                                VDS, SSL ve e-posta hizmetleri
+                            </p>
+
+                        </div>
+
+
+                        <div class="overflow-x-auto table-scroll">
+
+                            <table class="w-full min-w-[1000px] text-sm">
+
+                                <thead
+                                    class="bg-slate-50
+                                           border-b border-slate-200"
+                                >
+
+                                    <tr
+                                        class="text-left text-xs
+                                               uppercase tracking-wide
+                                               text-slate-500"
+                                    >
+
+                                        <th class="px-5 py-4">
+                                            ID
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Hizmet
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Kullanıcı
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Tür
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Fiyat
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Bitiş
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Durum
+                                        </th>
+
+                                        <th class="px-5 py-4 text-right">
+                                            İşlem
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody
+                                    id="servicesTableBody"
+                                    class="divide-y divide-slate-100"
+                                ></tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ========================================= -->
+                <!-- SİPARİŞLER -->
+                <!-- ========================================= -->
+
+                <section
+                    id="admin-section-orders"
+                    class="admin-section hidden"
+                >
+
+                    <div
+                        class="bg-white border border-slate-200
+                               rounded-2xl shadow-sm overflow-hidden"
+                    >
+
+                        <div
+                            class="p-6 border-b border-slate-100"
+                        >
+
+                            <h3 class="font-bold text-lg">
+                                Siparişler
+                            </h3>
+
+                            <p class="text-sm text-slate-500">
+                                Sistemde oluşturulan tüm siparişler
+                            </p>
+
+                        </div>
+
+
+                        <div class="overflow-x-auto table-scroll">
+
+                            <table class="w-full min-w-[800px] text-sm">
+
+                                <thead
+                                    class="bg-slate-50
+                                           border-b border-slate-200"
+                                >
+
+                                    <tr
+                                        class="text-left text-xs
+                                               uppercase tracking-wide
+                                               text-slate-500"
+                                    >
+
+                                        <th class="px-5 py-4">
+                                            Sipariş
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Kullanıcı
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Tutar
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Durum
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Tarih
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody
+                                    id="ordersTableBody"
+                                    class="divide-y divide-slate-100"
+                                ></tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ========================================= -->
+                <!-- FATURALAR -->
+                <!-- ========================================= -->
+
+                <section
+                    id="admin-section-invoices"
+                    class="admin-section hidden"
+                >
+
+                    <div
+                        class="bg-white border border-slate-200
+                               rounded-2xl shadow-sm overflow-hidden"
+                    >
+
+                        <div
+                            class="p-6 border-b border-slate-100"
+                        >
+
+                            <h3 class="font-bold text-lg">
+                                Faturalar
+                            </h3>
+
+                            <p class="text-sm text-slate-500">
+                                Tüm ödeme ve fatura kayıtları
+                            </p>
+
+                        </div>
+
+
+                        <div class="overflow-x-auto table-scroll">
+
+                            <table class="w-full min-w-[900px] text-sm">
+
+                                <thead
+                                    class="bg-slate-50
+                                           border-b border-slate-200"
+                                >
+
+                                    <tr
+                                        class="text-left text-xs
+                                               uppercase tracking-wide
+                                               text-slate-500"
+                                    >
+
+                                        <th class="px-5 py-4">
+                                            Fatura No
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Kullanıcı
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Hizmet
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Tür
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Tutar
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Durum
+                                        </th>
+
+                                        <th class="px-5 py-4">
+                                            Tarih
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody
+                                    id="invoicesTableBody"
+                                    class="divide-y divide-slate-100"
+                                ></tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+                <!-- ========================================= -->
+                <!-- SİSTEM -->
+                <!-- ========================================= -->
+
+                <section
+                    id="admin-section-system"
+                    class="admin-section hidden"
+                >
+
+                    <div
+                        class="grid grid-cols-1 lg:grid-cols-2 gap-6"
+                    >
+
+
+                        <div
+                            class="bg-white border border-slate-200
+                                   rounded-2xl p-6 shadow-sm"
+                        >
+
+                            <h3 class="font-bold text-lg">
+                                Backend
+                            </h3>
+
+                            <div class="mt-5 space-y-4">
+
+                                <div
+                                    class="flex items-center
+                                           justify-between"
+                                >
+
+                                    <span class="text-sm text-slate-500">
+                                        API Adresi
+                                    </span>
+
+                                    <span
+                                        class="font-mono text-xs
+                                               text-slate-700"
+                                    >
+                                        localhost:3000
+                                    </span>
+
+                                </div>
+
+
+                                <div
+                                    class="flex items-center
+                                           justify-between"
+                                >
+
+                                    <span class="text-sm text-slate-500">
+                                        Durum
+                                    </span>
+
+                                    <span
+                                        id="backendStatus"
+                                        class="px-3 py-1 rounded-full
+                                               bg-slate-100 text-slate-500
+                                               text-xs font-semibold"
+                                    >
+                                        Kontrol ediliyor
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="bg-white border border-slate-200
+                                   rounded-2xl p-6 shadow-sm"
+                        >
+
+                            <h3 class="font-bold text-lg">
+                                Veritabanı
+                            </h3>
+
+                            <div class="mt-5 space-y-4">
+
+                                <div
+                                    class="flex items-center
+                                           justify-between"
+                                >
+
+                                    <span class="text-sm text-slate-500">
+                                        Sistem
+                                    </span>
+
+                                    <span
+                                        class="text-sm font-semibold"
+                                    >
+                                        SQLite
+                                    </span>
+
+                                </div>
+
+
+                                <div
+                                    class="flex items-center
+                                           justify-between"
+                                >
+
+                                    <span class="text-sm text-slate-500">
+                                        Dosya
+                                    </span>
+
+                                    <span
+                                        class="font-mono text-xs"
+                                    >
+                                        vortex.db
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+
+            </main>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- TOAST -->
+    <!-- ===================================================== -->
+
+    <div
+        id="adminToast"
+        class="fixed top-6 right-6 z-[300] hidden"
+    >
+
+        <div
+            class="bg-white border border-slate-200
+                   shadow-2xl rounded-2xl
+                   px-5 py-4
+                   flex items-start gap-4
+                   max-w-sm"
+        >
+
+            <div
+                id="adminToastIcon"
+                class="w-10 h-10 rounded-xl
+                       bg-sky-50 text-sky-500
+                       flex items-center justify-center
+                       flex-shrink-0"
+            >
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+
+            <div>
+
+                <div
+                    id="adminToastTitle"
+                    class="font-bold text-sm text-slate-900"
+                >
+                    Bilgi
+                </div>
+
+                <div
+                    id="adminToastMessage"
+                    class="text-xs text-slate-500 mt-1"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- ADMIN JS -->
+    <!-- ===================================================== -->
+
+    <script>
+
+        const API_URL =
+            'http://localhost:3000';
+
+        let currentAdminSection =
+            'overview';
+
+        let adminUsers = [];
+        let adminServices = [];
+        let adminOrders = [];
+        let adminInvoices = [];
+
+
+        // =====================================================
+        // BAŞLANGIÇ
+        // =====================================================
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            async () => {
+
+                await checkAdminAccess();
+
+            }
+        );
+
+
+        // =====================================================
+        // ADMIN YETKİ KONTROLÜ
+        // =====================================================
+
+        async function checkAdminAccess() {
+
+            const token =
+                localStorage.getItem(
+                    'vortex_token'
+                );
+
+            const remembered =
+                localStorage.getItem(
+                    'vortex_logged_user'
+                );
+
+            const message =
+                document.getElementById(
+                    'accessMessage'
+                );
+
+
+            if (!token) {
+
+                message.textContent =
+                    'Giriş yapılmamış. Ana sayfaya yönlendiriliyorsunuz...';
+
+                setTimeout(
+                    () => {
+                        window.location.href =
+                            'index.html';
+                    },
+                    1800
+                );
+
+                return;
+            }
+
+
+            let user = null;
+
+
+            try {
+
+                if (remembered) {
+
+                    user =
+                        JSON.parse(
+                            remembered
+                        );
+
+                }
+
+            } catch {}
+
+
+            if (
+                !user ||
+                user.role !== 'admin'
+            ) {
+
+                message.textContent =
+                    'Bu sayfaya erişim yetkiniz bulunmuyor.';
+
+                setTimeout(
+                    () => {
+                        window.location.href =
+                            'index.html';
+                    },
+                    2000
+                );
+
+                return;
+            }
+
+
+            document.getElementById(
+                'sidebarAdminName'
+            ).textContent =
+                user.name ||
+                'Yönetici';
+
+
+            document.getElementById(
+                'sidebarAdminEmail'
+            ).textContent =
+                user.email ||
+                '-';
+
+
+            document.getElementById(
+                'accessScreen'
+            ).classList.add(
+                'hidden'
+            );
+
+
+            document.getElementById(
+                'adminPanel'
+            ).classList.remove(
+                'hidden'
+            );
+
+
+            await loadDashboard();
+
+        }
+
+
+        // =====================================================
+        // API HELPER
+        // =====================================================
+
+        async function adminFetch(
+            endpoint,
+            options = {}
+        ) {
+
+            const token =
+                localStorage.getItem(
+                    'vortex_token'
+                );
+
+
+            const response =
+                await fetch(
+                    API_URL + endpoint,
+                    {
+                        ...options,
+
+                        headers: {
+                            'Content-Type':
+                                'application/json',
+
+                            'Authorization':
+                                `Bearer ${token}`,
+
+                            ...(options.headers || {})
+                        }
+                    }
+                );
+
+
+            let data = {};
+
+
+            try {
+
+                data =
+                    await response.json();
+
+            } catch {}
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    `HTTP ${response.status}`
+                );
+
+            }
+
+
+            return data;
+
+        }
+
+
+        // =====================================================
+        // DASHBOARD YÜKLE
+        // =====================================================
+
+        async function loadDashboard() {
+
+            await Promise.allSettled([
+                loadStats(),
+                loadUsers(),
+                loadServices(),
+                loadOrders(),
+                loadInvoices()
+            ]);
+
+        }
+
+
+        // =====================================================
+        // İSTATİSTİK
+        // =====================================================
+
+        async function loadStats() {
+
+            try {
+
+                const data =
+                    await adminFetch(
+                        '/api/admin/stats'
+                    );
+
+
+                document.getElementById(
+                    'statUsers'
+                ).textContent =
+                    data.users ?? 0;
+
+
+                document.getElementById(
+                    'statServices'
+                ).textContent =
+                    data.activeServices ?? 0;
+
+
+                document.getElementById(
+                    'statOrders'
+                ).textContent =
+                    data.orders ?? 0;
+
+
+                document.getElementById(
+                    'statRevenue'
+                ).textContent =
+                    `₺${Number(
+                        data.revenue || 0
+                    ).toFixed(2)}`;
+
+
+                setBackendStatus(
+                    true
+                );
+
+            } catch (error) {
+
+                console.error(
+                    'ADMIN STATS ERROR:',
+                    error
+                );
+
+
+                setBackendStatus(
+                    false
+                );
+
+            }
+
+        }
+
+
+        // =====================================================
+        // KULLANICILAR
+        // =====================================================
+
+        async function loadUsers() {
+
+            try {
+
+                const data =
+                    await adminFetch(
+                        '/api/admin/users'
+                    );
+
+
+                adminUsers =
+                    Array.isArray(
+                        data.users
+                    )
+                        ? data.users
+                        : [];
+
+
+                renderUsers();
+
+                renderRecentUsers();
+
+            } catch (error) {
+
+                console.error(
+                    'ADMIN USERS ERROR:',
+                    error
+                );
+
+            }
+
+        }
+
+
+        function renderUsers(
+            list = adminUsers
+        ) {
+
+            const body =
+                document.getElementById(
+                    'usersTableBody'
+                );
+
+
+            if (!body) return;
+
+
+            if (
+                list.length === 0
+            ) {
+
+                body.innerHTML = `
+                    <tr>
+                        <td
+                            colspan="6"
+                            class="px-5 py-12 text-center text-slate-400"
+                        >
+                            Kullanıcı bulunamadı.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            body.innerHTML =
+                list.map(
+                    user => `
+                        <tr class="hover:bg-slate-50 transition">
+
+                            <td class="px-5 py-4 font-mono text-xs">
+                                #${user.id}
+                            </td>
+
+                            <td class="px-5 py-4">
+                                <div class="font-semibold text-slate-900">
+                                    ${escapeHtml(user.name || '-')}
+                                </div>
+                            </td>
+
+                            <td class="px-5 py-4 text-slate-500">
+                                ${escapeHtml(user.email || '-')}
+                            </td>
+
+                            <td class="px-5 py-4">
+
+                                ${
+                                    user.role === 'admin'
+                                        ? `
+                                            <span
+                                                class="px-2.5 py-1 rounded-full
+                                                       text-xs font-semibold
+                                                       bg-violet-50 text-violet-600"
+                                            >
+                                                Admin
+                                            </span>
+                                        `
+                                        : `
+                                            <span
+                                                class="px-2.5 py-1 rounded-full
+                                                       text-xs font-semibold
+                                                       bg-slate-100 text-slate-600"
+                                            >
+                                                Kullanıcı
+                                            </span>
+                                        `
+                                }
+
+                            </td>
+
+                            <td class="px-5 py-4 text-slate-500">
+                                ${formatAdminDate(user.created_at)}
+                            </td>
+
+                            <td class="px-5 py-4 text-right">
+
+                                <button
+                                    onclick="toggleUserRole(${user.id}, '${user.role}')"
+                                    class="px-3 py-2 rounded-lg
+                                           border border-slate-200
+                                           hover:border-sky-300
+                                           hover:text-sky-600
+                                           text-xs font-semibold transition"
+                                >
+                                    ${
+                                        user.role === 'admin'
+                                            ? 'Kullanıcı Yap'
+                                            : 'Admin Yap'
+                                    }
+                                </button>
+
+                            </td>
+
+                        </tr>
+                    `
+                ).join('');
+
+        }
+
+
+        function filterUsers() {
+
+            const input =
+                document.getElementById(
+                    'userSearch'
+                );
+
+
+            const search =
+                String(
+                    input?.value ||
+                    ''
+                )
+                    .toLocaleLowerCase(
+                        'tr-TR'
+                    )
+                    .trim();
+
+
+            if (!search) {
+
+                renderUsers(
+                    adminUsers
+                );
+
+                return;
+
+            }
+
+
+            const filtered =
+                adminUsers.filter(
+                    user =>
+                        String(
+                            user.name || ''
+                        )
+                            .toLocaleLowerCase(
+                                'tr-TR'
+                            )
+                            .includes(search) ||
+
+                        String(
+                            user.email || ''
+                        )
+                            .toLocaleLowerCase(
+                                'tr-TR'
+                            )
+                            .includes(search)
+                );
+
+
+            renderUsers(
+                filtered
+            );
+
+        }
+
+
+        async function toggleUserRole(
+            userId,
+            currentRole
+        ) {
+
+            const newRole =
+                currentRole === 'admin'
+                    ? 'user'
+                    : 'admin';
+
+
+            if (
+                !confirm(
+                    `Kullanıcının rolü "${newRole}" olarak değiştirilsin mi?`
+                )
+            ) {
+                return;
+            }
+
+
+            try {
+
+                await adminFetch(
+                    `/api/admin/users/${userId}/role`,
+                    {
+                        method:
+                            'PATCH',
+
+                        body:
+                            JSON.stringify({
+                                role:
+                                    newRole
+                            })
+                    }
+                );
+
+
+                showAdminToast(
+                    'Rol Güncellendi',
+                    'Kullanıcı yetkisi başarıyla değiştirildi.'
+                );
+
+
+                await loadUsers();
+
+            } catch (error) {
+
+                showAdminToast(
+                    'Hata',
+                    error.message
+                );
+
+            }
+
+        }
+
+
+        // =====================================================
+        // HİZMETLER
+        // =====================================================
+
+        async function loadServices() {
+
+            try {
+
+                const data =
+                    await adminFetch(
+                        '/api/admin/services'
+                    );
+
+
+                adminServices =
+                    Array.isArray(
+                        data.services
+                    )
+                        ? data.services
+                        : [];
+
+
+                renderServices();
+
+            } catch (error) {
+
+                console.error(
+                    'ADMIN SERVICES ERROR:',
+                    error
+                );
+
+            }
+
+        }
+
+
+        function renderServices() {
+
+            const body =
+                document.getElementById(
+                    'servicesTableBody'
+                );
+
+
+            if (!body) return;
+
+
+            if (
+                adminServices.length === 0
+            ) {
+
+                body.innerHTML = `
+                    <tr>
+                        <td
+                            colspan="8"
+                            class="px-5 py-12 text-center text-slate-400"
+                        >
+                            Hizmet bulunamadı.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            body.innerHTML =
+                adminServices.map(
+                    service => {
+
+                        const status =
+                            service.status ||
+                            'Aktif';
+
+
+                        let badge =
+                            'bg-emerald-50 text-emerald-600';
+
+
+                        if (
+                            status ===
+                            'İptal Edildi'
+                        ) {
+
+                            badge =
+                                'bg-red-50 text-red-600';
+
+                        } else if (
+                            status ===
+                            'Süresi Doldu'
+                        ) {
+
+                            badge =
+                                'bg-amber-50 text-amber-600';
+
+                        }
+
+
+                        return `
+                            <tr class="hover:bg-slate-50">
+
+                                <td class="px-5 py-4 font-mono text-xs">
+                                    #${service.id}
+                                </td>
+
+                                <td class="px-5 py-4 font-semibold">
+                                    ${escapeHtml(service.name)}
+                                </td>
+
+                                <td class="px-5 py-4 text-slate-500">
+                                    ${escapeHtml(
+                                        service.user_email ||
+                                        service.email ||
+                                        `#${service.user_id}`
+                                    )}
+                                </td>
+
+                                <td class="px-5 py-4">
+                                    ${escapeHtml(service.type)}
+                                </td>
+
+                                <td class="px-5 py-4 font-semibold">
+                                    ₺${Number(service.price || 0).toFixed(2)}
+                                </td>
+
+                                <td class="px-5 py-4 text-slate-500">
+                                    ${formatAdminDate(service.expiry_date)}
+                                </td>
+
+                                <td class="px-5 py-4">
+
+                                    <span
+                                        class="px-2.5 py-1
+                                               rounded-full text-xs
+                                               font-semibold ${badge}"
+                                    >
+                                        ${status}
+                                    </span>
+
+                                </td>
+
+                                <td class="px-5 py-4 text-right">
+
+                                    <select
+                                        onchange="changeServiceStatus(
+                                            ${service.id},
+                                            this.value
+                                        )"
+                                        class="border border-slate-200
+                                               rounded-lg px-3 py-2
+                                               text-xs bg-white"
+                                    >
+
+                                        <option
+                                            value="Aktif"
+                                            ${status === 'Aktif' ? 'selected' : ''}
+                                        >
+                                            Aktif
+                                        </option>
+
+                                        <option
+                                            value="Süresi Doldu"
+                                            ${status === 'Süresi Doldu' ? 'selected' : ''}
+                                        >
+                                            Süresi Doldu
+                                        </option>
+
+                                        <option
+                                            value="İptal Edildi"
+                                            ${status === 'İptal Edildi' ? 'selected' : ''}
+                                        >
+                                            İptal Edildi
+                                        </option>
+
+                                    </select>
+
+                                </td>
+
+                            </tr>
+                        `;
+
+                    }
+                ).join('');
+
+        }
+
+
+        async function changeServiceStatus(
+            serviceId,
+            status
+        ) {
+
+            try {
+
+                await adminFetch(
+                    `/api/admin/services/${serviceId}/status`,
+                    {
+                        method:
+                            'PATCH',
+
+                        body:
+                            JSON.stringify({
+                                status
+                            })
+                    }
+                );
+
+
+                showAdminToast(
+                    'Hizmet Güncellendi',
+                    'Hizmet durumu değiştirildi.'
+                );
+
+
+                await Promise.all([
+                    loadServices(),
+                    loadStats()
+                ]);
+
+            } catch (error) {
+
+                showAdminToast(
+                    'Hata',
+                    error.message
+                );
+
+            }
+
+        }
+
+
+        // =====================================================
+        // SİPARİŞLER
+        // =====================================================
+
+        async function loadOrders() {
+
+            try {
+
+                const data =
+                    await adminFetch(
+                        '/api/admin/orders'
+                    );
+
+
+                adminOrders =
+                    Array.isArray(
+                        data.orders
+                    )
+                        ? data.orders
+                        : [];
+
+
+                renderOrders();
+
+                renderRecentOrders();
+
+            } catch (error) {
+
+                console.error(
+                    'ADMIN ORDERS ERROR:',
+                    error
+                );
+
+            }
+
+        }
+
+
+        function renderOrders() {
+
+            const body =
+                document.getElementById(
+                    'ordersTableBody'
+                );
+
+
+            if (!body) return;
+
+
+            if (
+                adminOrders.length === 0
+            ) {
+
+                body.innerHTML = `
+                    <tr>
+                        <td
+                            colspan="5"
+                            class="px-5 py-12
+                                   text-center text-slate-400"
+                        >
+                            Sipariş bulunamadı.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            body.innerHTML =
+                adminOrders.map(
+                    order => `
+                        <tr class="hover:bg-slate-50">
+
+                            <td class="px-5 py-4 font-mono text-xs">
+                                #${order.id}
+                            </td>
+
+                            <td class="px-5 py-4 text-slate-500">
+                                ${escapeHtml(
+                                    order.user_email ||
+                                    `#${order.user_id}`
+                                )}
+                            </td>
+
+                            <td class="px-5 py-4 font-bold">
+                                ₺${Number(order.total || 0).toFixed(2)}
+                            </td>
+
+                            <td class="px-5 py-4">
+                                ${escapeHtml(order.status || '-')}
+                            </td>
+
+                            <td class="px-5 py-4 text-slate-500">
+                                ${formatAdminDate(order.created_at)}
+                            </td>
+
+                        </tr>
+                    `
+                ).join('');
+
+        }
+
+
+        // =====================================================
+        // FATURALAR
+        // =====================================================
+
+        async function loadInvoices() {
+
+            try {
+
+                const data =
+                    await adminFetch(
+                        '/api/admin/invoices'
+                    );
+
+
+                adminInvoices =
+                    Array.isArray(
+                        data.invoices
+                    )
+                        ? data.invoices
+                        : [];
+
+
+                renderInvoices();
+
+            } catch (error) {
+
+                console.error(
+                    'ADMIN INVOICES ERROR:',
+                    error
+                );
+
+            }
+
+        }
+
+
+        function renderInvoices() {
+
+            const body =
+                document.getElementById(
+                    'invoicesTableBody'
+                );
+
+
+            if (!body) return;
+
+
+            if (
+                adminInvoices.length === 0
+            ) {
+
+                body.innerHTML = `
+                    <tr>
+                        <td
+                            colspan="7"
+                            class="px-5 py-12
+                                   text-center text-slate-400"
+                        >
+                            Fatura bulunamadı.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            body.innerHTML =
+                adminInvoices.map(
+                    invoice => `
+                        <tr class="hover:bg-slate-50">
+
+                            <td class="px-5 py-4 font-mono text-xs">
+                                ${
+                                    escapeHtml(
+                                        invoice.invoice_no ||
+                                        `#${invoice.id}`
+                                    )
+                                }
+                            </td>
+
+                            <td class="px-5 py-4 text-slate-500">
+                                ${
+                                    escapeHtml(
+                                        invoice.user_email ||
+                                        `#${invoice.user_id}`
+                                    )
+                                }
+                            </td>
+
+                            <td class="px-5 py-4 font-semibold">
+                                ${escapeHtml(invoice.service_name || '-')}
+                            </td>
+
+                            <td class="px-5 py-4">
+                                ${escapeHtml(invoice.type || '-')}
+                            </td>
+
+                            <td class="px-5 py-4 font-bold">
+                                ₺${Number(invoice.amount || 0).toFixed(2)}
+                            </td>
+
+                            <td class="px-5 py-4">
+                                ${escapeHtml(invoice.status || '-')}
+                            </td>
+
+                            <td class="px-5 py-4 text-slate-500">
+                                ${formatAdminDate(invoice.created_at)}
+                            </td>
+
+                        </tr>
+                    `
+                ).join('');
+
+        }
+
+
+        // =====================================================
+        // SON KULLANICILAR
+        // =====================================================
+
+        function renderRecentUsers() {
+
+            const box =
+                document.getElementById(
+                    'recentUsers'
+                );
+
+
+            if (!box) return;
+
+
+            const list =
+                adminUsers.slice(
+                    0,
+                    5
+                );
+
+
+            if (
+                list.length === 0
+            ) {
+
+                box.innerHTML = `
+                    <div class="text-sm text-slate-400">
+                        Kullanıcı bulunamadı.
+                    </div>
+                `;
+
+                return;
+            }
+
+
+            box.innerHTML =
+                list.map(
+                    user => `
+                        <div
+                            class="flex items-center justify-between
+                                   py-3 border-b border-slate-100
+                                   last:border-0"
+                        >
+
+                            <div>
+
+                                <div class="font-semibold text-sm">
+                                    ${escapeHtml(user.name || '-')}
+                                </div>
+
+                                <div class="text-xs text-slate-500 mt-1">
+                                    ${escapeHtml(user.email || '-')}
+                                </div>
+
+                            </div>
+
+                            <span
+                                class="text-[11px] px-2.5 py-1
+                                       rounded-full bg-slate-100
+                                       text-slate-500"
+                            >
+                                ${escapeHtml(user.role || 'user')}
+                            </span>
+
+                        </div>
+                    `
+                ).join('');
+
+        }
+
+
+        // =====================================================
+        // SON SİPARİŞLER
+        // =====================================================
+
+        function renderRecentOrders() {
+
+            const box =
+                document.getElementById(
+                    'recentOrders'
+                );
+
+
+            if (!box) return;
+
+
+            const list =
+                adminOrders.slice(
+                    0,
+                    5
+                );
+
+
+            if (
+                list.length === 0
+            ) {
+
+                box.innerHTML = `
+                    <div class="text-sm text-slate-400">
+                        Sipariş bulunamadı.
+                    </div>
+                `;
+
+                return;
+            }
+
+
+            box.innerHTML =
+                list.map(
+                    order => `
+                        <div
+                            class="flex items-center justify-between
+                                   py-3 border-b border-slate-100
+                                   last:border-0"
+                        >
+
+                            <div>
+
+                                <div class="font-semibold text-sm">
+                                    Sipariş #${order.id}
+                                </div>
+
+                                <div class="text-xs text-slate-500 mt-1">
+                                    ${formatAdminDate(order.created_at)}
+                                </div>
+
+                            </div>
+
+                            <div
+                                class="font-bold text-sm text-slate-900"
+                            >
+                                ₺${Number(order.total || 0).toFixed(2)}
+                            </div>
+
+                        </div>
+                    `
+                ).join('');
+
+        }
+
+
+        // =====================================================
+        // MENÜ
+        // =====================================================
+
+        async function showAdminSection(
+            section
+        ) {
+
+            currentAdminSection =
+                section;
+
+
+            document.querySelectorAll(
+                '.admin-section'
+            ).forEach(
+                element =>
+                    element.classList.add(
+                        'hidden'
+                    )
+            );
+
+
+            const target =
+                document.getElementById(
+                    `admin-section-${section}`
+                );
+
+
+            if (target) {
+
+                target.classList.remove(
+                    'hidden'
+                );
+
+            }
+
+
+            document.querySelectorAll(
+                '[id^="admin-nav-"]'
+            ).forEach(
+                element =>
+                    element.classList.remove(
+                        'active'
+                    )
+            );
+
+
+            const nav =
+                document.getElementById(
+                    `admin-nav-${section}`
+                );
+
+
+            if (nav) {
+
+                nav.classList.add(
+                    'active'
+                );
+
+            }
+
+
+            const titles = {
+
+                overview: [
+                    'Genel Bakış',
+                    'Vortex Hosting yönetim merkezi'
+                ],
+
+                users: [
+                    'Kullanıcılar',
+                    'Kullanıcı hesaplarını yönetin'
+                ],
+
+                services: [
+                    'Hizmetler',
+                    'Tüm müşteri hizmetlerini yönetin'
+                ],
+
+                orders: [
+                    'Siparişler',
+                    'Sipariş kayıtlarını görüntüleyin'
+                ],
+
+                invoices: [
+                    'Faturalar',
+                    'Ödeme ve fatura kayıtlarını görüntüleyin'
+                ],
+
+                system: [
+                    'Sistem',
+                    'Sistem ve backend bilgileri'
+                ]
+
+            };
+
+
+            const info =
+                titles[section] ||
+                titles.overview;
+
+
+            document.getElementById(
+                'pageTitle'
+            ).textContent =
+                info[0];
+
+
+            document.getElementById(
+                'pageSubtitle'
+            ).textContent =
+                info[1];
+
+
+            if (
+                section === 'users'
+            ) {
+
+                await loadUsers();
+
+            }
+
+
+            if (
+                section === 'services'
+            ) {
+
+                await loadServices();
+
+            }
+
+
+            if (
+                section === 'orders'
+            ) {
+
+                await loadOrders();
+
+            }
+
+
+            if (
+                section === 'invoices'
+            ) {
+
+                await loadInvoices();
+
+            }
+
+        }
+
+
+        // =====================================================
+        // YENİLE
+        // =====================================================
+
+        async function refreshCurrentSection() {
+
+            if (
+                currentAdminSection ===
+                'overview'
+            ) {
+
+                await loadDashboard();
+
+            } else {
+
+                await showAdminSection(
+                    currentAdminSection
+                );
+
+            }
+
+
+            showAdminToast(
+                'Yenilendi',
+                'Admin panel verileri güncellendi.'
+            );
+
+        }
+
+
+        // =====================================================
+        // BACKEND DURUMU
+        // =====================================================
+
+        function setBackendStatus(
+            active
+        ) {
+
+            const element =
+                document.getElementById(
+                    'backendStatus'
+                );
+
+
+            if (!element) return;
+
+
+            if (active) {
+
+                element.textContent =
+                    'Çalışıyor';
+
+
+                element.className =
+                    'px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-semibold';
+
+            } else {
+
+                element.textContent =
+                    'Bağlantı Yok';
+
+
+                element.className =
+                    'px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-semibold';
+
+            }
+
+        }
+
+
+        // =====================================================
+        // MOBİL MENÜ
+        // =====================================================
+
+        function openMobileSidebar() {
+
+            document.getElementById(
+                'mobileSidebar'
+            ).classList.remove(
+                '-translate-x-full'
+            );
+
+
+            document.getElementById(
+                'mobileSidebarBackdrop'
+            ).classList.remove(
+                'hidden'
+            );
+
+        }
+
+
+        function closeMobileSidebar() {
+
+            document.getElementById(
+                'mobileSidebar'
+            ).classList.add(
+                '-translate-x-full'
+            );
+
+
+            document.getElementById(
+                'mobileSidebarBackdrop'
+            ).classList.add(
+                'hidden'
+            );
+
+        }
+
+
+        function mobileNavigate(
+            section
+        ) {
+
+            closeMobileSidebar();
+
+            showAdminSection(
+                section
+            );
+
+        }
+
+
+        // =====================================================
+        // ÇIKIŞ
+        // =====================================================
+
+        function adminLogout() {
+
+            localStorage.removeItem(
+                'vortex_token'
+            );
+
+            localStorage.removeItem(
+                'vortex_logged_user'
+            );
+
+
+            window.location.href =
+                'index.html';
+
+        }
+
+
+        function goToWebsite() {
+
+            window.location.href =
+                'index.html';
+
+        }
+
+
+        // =====================================================
+        // TOAST
+        // =====================================================
+
+        function showAdminToast(
+            title,
+            message
+        ) {
+
+            const toast =
+                document.getElementById(
+                    'adminToast'
+                );
+
+
+            document.getElementById(
+                'adminToastTitle'
+            ).textContent =
+                title;
+
+
+            document.getElementById(
+                'adminToastMessage'
+            ).textContent =
+                message;
+
+
+            toast.classList.remove(
+                'hidden'
+            );
+
+
+            setTimeout(
+                () => {
+
+                    toast.classList.add(
+                        'hidden'
+                    );
+
+                },
+                3500
+            );
+
+        }
+
+
+        // =====================================================
+        // TARİH
+        // =====================================================
+
+        function formatAdminDate(
+            value
+        ) {
+
+            if (!value) {
+
+                return '-';
+
+            }
+
+
+            const normalized =
+                String(value).includes('T')
+                    ? String(value)
+                    : String(value)
+                        .replace(
+                            ' ',
+                            'T'
+                        );
+
+
+            const date =
+                new Date(
+                    normalized
+                );
+
+
+            if (
+                Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+
+                return value;
+
+            }
+
+
+            return date.toLocaleDateString(
+                'tr-TR',
+                {
+                    day:
+                        '2-digit',
+
+                    month:
+                        '2-digit',
+
+                    year:
+                        'numeric'
+                }
+            );
+
+        }
+
+
+        // =====================================================
+        // HTML GÜVENLİĞİ
+        // =====================================================
+
+        function escapeHtml(
+            value
+        ) {
+
+            return String(
+                value ?? ''
+            )
+                .replaceAll(
+                    '&',
+                    '&amp;'
+                )
+                .replaceAll(
+                    '<',
+                    '&lt;'
+                )
+                .replaceAll(
+                    '>',
+                    '&gt;'
+                )
+                .replaceAll(
+                    '"',
+                    '&quot;'
+                )
+                .replaceAll(
+                    "'",
+                    '&#039;'
+                );
+
+        }
+
+    </script>
+
+</body>
+</html>

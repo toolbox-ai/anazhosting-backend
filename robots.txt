@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://anazhosting.com.tr/sitemap.xml

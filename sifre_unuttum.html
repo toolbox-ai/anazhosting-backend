@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Şifremi Unuttum | ANAZHOSTING</title>
+</head>
+
+<body>
+
+    <h2>Şifremi Unuttum</h2>
+
+    <form id="forgotPasswordForm">
+        <label for="email">E-posta Adresiniz:</label><br>
+
+        <input
+            type="email"
+            id="email"
+            required
+            placeholder="ornek@gmail.com"
+        >
+
+        <br><br>
+
+        <button type="submit" id="submitButton">
+            Doğrulama Kodu Gönder
+        </button>
+    </form>
+
+    <p id="message"></p>
+
+    <script>
+        const API_URL =
+            "https://anazhosting-backend.onrender.com";
+
+        const form =
+            document.getElementById("forgotPasswordForm");
+
+        const message =
+            document.getElementById("message");
+
+        const submitButton =
+            document.getElementById("submitButton");
+
+        form.addEventListener("submit", async (event) => {
+
+            event.preventDefault();
+
+            const email =
+                document.getElementById("email")
+                    .value
+                    .trim();
+
+            message.textContent = "Gönderiliyor...";
+            submitButton.disabled = true;
+
+            try {
+
+                const response = await fetch(
+                    `${API_URL}/api/auth/forgot-password`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            email: email
+                        })
+                    }
+                );
+
+                const data =
+                    await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.message ||
+                        "İşlem gerçekleştirilemedi."
+                    );
+                }
+
+                message.textContent =
+                    data.message ||
+                    "Doğrulama kodu gönderildi.";
+
+            } catch (error) {
+
+                console.error(error);
+
+                message.textContent =
+                    error.message ||
+                    "Sunucuya bağlanılamadı.";
+
+            } finally {
+
+                submitButton.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>
